@@ -1,5 +1,6 @@
 import rancher
 import petname
+import argparse
 
 class RancherRegsitration:
     def __init__(self, rancher_url, access_key, secret_key, cert_verify=True):
@@ -23,9 +24,16 @@ class RancherRegsitration:
         return reg_data.data_dict()['manifestUrl']
 
 def main():
-    rancher_url = 'https://rancher.maas/v3'
-    access_key = 'token-fc4gq'
-    secret_key = 'xwzp5qwqrk7qtwgrc8lrfpfzrtwq6cspgfff8mzwkfd4pfpzb6plmf'
+
+    parser = argparse.ArgumentParser(description='Handle cluster registration in rancher')
+    parser.add_argument('-l', '--url', help='Rancher url')
+    parser.add_argument('-u', '--username', help='API access key')
+    parser.add_argument('-p', '--password', help='API secret key')
+    parser.options = parser.parse_args()
+
+    rancher_url = 'https://' + parser.options.url + '/v3'
+    access_key = parser.options.username
+    secret_key = parser.options.password
     r = RancherRegsitration(rancher_url, access_key, secret_key, False)
     manifest = r.register_cluster()
     print(manifest)
