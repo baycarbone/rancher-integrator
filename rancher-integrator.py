@@ -22,7 +22,7 @@ class RancherRegsitration:
         reg_data = self.client.create_clusterRegistrationToken(clusterId=cluster_data.data_dict()["id"])
 
         # get url of k8s import manifest
-        return reg_data.data_dict()['manifestUrl']
+        return name + ' - ' + reg_data.data_dict()['manifestUrl']
 
     def delete_cluster(self, name):
         # get cluster by name

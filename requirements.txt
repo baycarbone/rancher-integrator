@@ -1,0 +1,2 @@
+petname==2.6
+git+https://github.com/rancher/client-python.git@master
