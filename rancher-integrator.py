@@ -1,6 +1,7 @@
 import rancher
 import petname
 import argparse
+import time
 
 class RancherRegsitration:
     def __init__(self, rancher_url, access_key, secret_key, cert_verify=True):
@@ -50,6 +51,7 @@ def main():
     parser.add_argument('username', help='API access key')
     parser.add_argument('password', help='API secret key')
     parser.add_argument('-i', '--insecure', help='Allow insecure https', action="store_true")
+    parser.add_argument('-d', '--daemon', help='Run forever', action="store_true")
 
     # subparser for the different commands e.g. register, delete
     subparsers = parser.add_subparsers(dest='command', help='Sub-commands')
@@ -69,7 +71,7 @@ def main():
         secret_key = args.password
 
         # create RancherRegsitration object with connection details
-        if args.insecure :
+        if args.insecure:
             r = RancherRegsitration(rancher_url, access_key, secret_key, False)
         else:
             r = RancherRegsitration(rancher_url, access_key, secret_key)
@@ -80,6 +82,15 @@ def main():
         elif args.command == 'delete':
             resp = r.delete_cluster(args.name)
             print(resp)
+
+        if args.daemon:
+            loop_forever = True
+            while loop_forever:
+                try:
+                    time.sleep(10)
+                except KeyboardInterrupt:
+                    loop_forever = False
+
     else:
         parser.print_help()
 
