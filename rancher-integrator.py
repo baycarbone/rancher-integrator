@@ -57,7 +57,7 @@ def main():
     parser.add_argument('username', help='API access key')
     parser.add_argument('password', help='API secret key')
     parser.add_argument('-i', '--insecure', help='Allow insecure https', action="store_true")
-    parser.add_argument('-d', '--daemon', help='Run forever', action="store_true")
+    parser.add_argument('-w', '--wait', help='Run forever', action="store_true")
 
     # subparser for the different commands e.g. register, unregister
     subparsers = parser.add_subparsers(dest='command', help='Sub-commands')
@@ -67,7 +67,7 @@ def main():
     register_parser.add_argument('-n', '--name', help='new cluster name')
 
     # unregister subparser
-    unregister_parser = subparsers.add_parser('unregister', help='unregister a cluster from rancher')
+    unregister_parser = subparsers.add_parser('unregister', help='UNREGISTER a cluster from rancher')
     unregister_parser.add_argument('name', help='cluster name')
 
     args = parser.parse_args()
@@ -90,7 +90,7 @@ def main():
             resp = r.unregister_cluster(args.name)
             print(resp)
 
-        if args.daemon:
+        if args.wait:
             loop_forever = True
             while loop_forever:
                 try:
