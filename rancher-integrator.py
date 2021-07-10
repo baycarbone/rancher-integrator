@@ -13,6 +13,10 @@ from pathlib import Path
 
 class RancherRegsitration:
     def __init__(self, rancher_url, access_key, secret_key, cert_verify=True):
+        # clear log file
+        with open('error.log', 'w'):
+            pass
+        logging.basicConfig(filename='error.log', level=logging.ERROR)
         self.client = self._create_client(rancher_url, access_key, secret_key, cert_verify)
 
     def _create_client(self, rancher_url, access_key, secret_key, cert_verify):
