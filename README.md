@@ -29,3 +29,14 @@ optional arguments:
                         Toggle insecure https
   -w WAIT, --wait WAIT  Toggle run forever
 ```
+
+The following environment variables can be used instead of command line arguments.
+However in case both are set, command line arguments take precedence over environment variables.
+```
+RANCHER_INTEGRATOR_URL
+RANCHER_INTEGRATOR_USERNAME
+RANCHER_INTEGRATOR_PASSWORD
+RANCHER_INTEGRATOR_INSECURE
+RANCHER_INTEGRATOR_WAIT
+RANCHER_INTEGRATOR_CLUSTER_NAME
+```

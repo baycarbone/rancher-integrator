@@ -168,13 +168,13 @@ def main():
     parser = argparse.ArgumentParser(
         prog='rancher-integrator',
         description='Handle cluster registration in rancher',
-        epilog="See '<command> --help' to read about a specific sub-command."
+        epilog="See '<command> --help' to read about a specific sub-command. More information avaiable at https://github.com/baycarbone/rancher-integrator"
     )
 
     # rancher connection details as positional arguments
-    parser.add_argument('--url', default=os.getenv('RANCHER_INTEGRATOR_URL'), help='Rancher url')
-    parser.add_argument('--username', default=os.getenv('RANCHER_INTEGRATOR_USERNAME'), help='API access key')
-    parser.add_argument('--password', default=os.getenv('RANCHER_INTEGRATOR_PASSWORD'), help='API secret key')
+    parser.add_argument('--url', default=os.getenv('RANCHER_INTEGRATOR_URL'), required=True, help='Rancher url')
+    parser.add_argument('--username', default=os.getenv('RANCHER_INTEGRATOR_USERNAME'), required=True, help='API access key')
+    parser.add_argument('--password', default=os.getenv('RANCHER_INTEGRATOR_PASSWORD'), required=True, help='API secret key')
     parser.add_argument('-i', '--insecure', default=os.getenv('RANCHER_INTEGRATOR_INSECURE'),  help='Toggle insecure https')
     parser.add_argument('-w', '--wait', default=os.getenv('RANCHER_INTEGRATOR_WAIT'), help='Toggle run forever')
 
@@ -183,11 +183,11 @@ def main():
 
     # register subparser
     register_parser = subparsers.add_parser('register', help='REGISTER a cluster in rancher')
-    register_parser.add_argument('-n', '--name', help='new cluster name')
+    register_parser.add_argument('-n', '--name', default=os.getenv('RANCHER_INTEGRATOR_CLUSTER_NAME'), help='new cluster name')
 
     # unregister subparser
     unregister_parser = subparsers.add_parser('unregister',  help='UNREGISTER a cluster from rancher')
-    unregister_parser.add_argument('name', default=os.getenv('RANCHER_INTEGRATOR_NAME'), help='cluster name')
+    unregister_parser.add_argument('--name', default=os.getenv('RANCHER_INTEGRATOR_CLUSTER_NAME'), required=True, help='cluster name')
 
     # verify_api subparser
     verify_api_parser = subparsers.add_parser('verify', help='VERIFY the API credentials are suitable for cluster management')
