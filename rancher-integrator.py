@@ -10,6 +10,8 @@ import logging
 import re
 import os
 from pathlib import Path
+import random
+from json.decoder import JSONDecodeError
 
 class RancherRegsitration:
     def __init__(self, rancher_url, access_key, secret_key, cert_verify=True):
@@ -17,9 +19,10 @@ class RancherRegsitration:
         with open('error.log', 'w'):
             pass
         logging.basicConfig(filename='error.log', level=logging.ERROR)
+        logging.getLogger().addHandler(logging.StreamHandler())
         self.client = self._create_client(rancher_url, access_key, secret_key, cert_verify)
 
-    def _create_client(self, rancher_url, access_key, secret_key, cert_verify):
+    def _create_client(self, rancher_url, access_key, secret_key, cert_verify=True):
         '''Create a client for the Rancher API'''
 
         try:
@@ -37,8 +40,37 @@ class RancherRegsitration:
         except rancher.ApiError as err:
             logging.error('Failed to create a Rancher API client, please check the API credentials: %s.', err)
             sys.exit()
+        except JSONDecodeError as err:
+            logging.error('Failed to create a Rancher API client, please check the API connection details. JSONDecodeError: %s', err)
+            sys.exit()
 
         return client
+
+    def verify_api_client(self):
+        '''Verify if the API client allows cluster management'''
+
+        temp_cluster = "to-delete-" + str(random.randint(0000,9999))
+        try:
+            self.client.create_cluster(name=temp_cluster)
+        except rancher.ApiError as err:
+            if re.search(r'Forbidden.*cannot create resource "clusters"', str(err)):
+                logging.error('Failed to create temp cluster %s, please check the API credentials as they do not allow the creation of clusters.', temp_cluster)
+                return False
+            elif re.search(r'NotUnique.*Cluster name', str(err)):
+                logging.error('Failed to create temp cluster %s, a cluster with the same name already exists.', temp_cluster)
+                return False
+            else:
+                logging.error('Failed to create temp cluster %s, API error: %s.', temp_cluster, err)
+                return False
+
+        time.sleep(1)
+        try:
+            self.unregister_cluster(temp_cluster)
+        except rancher.ApiError as err:
+            logging.error('Failed to create temp cluster %s, API error: %s.', temp_cluster, err)
+            return False
+
+        return True
 
     def register_cluster(self, name):
         '''Register a cluster in a Rancher platform and retrieve the Kubernetes import manifest'''
@@ -140,11 +172,11 @@ def main():
     )
 
     # rancher connection details as positional arguments
-    parser.add_argument('url', help='Rancher url')
-    parser.add_argument('username', help='API access key')
-    parser.add_argument('password', help='API secret key')
-    parser.add_argument('-i', '--insecure', help='Allow insecure https', action='store_true')
-    parser.add_argument('-w', '--wait', help='Run forever', action='store_true')
+    parser.add_argument('--url', default=os.getenv('RANCHER_INTEGRATOR_URL'), help='Rancher url')
+    parser.add_argument('--username', default=os.getenv('RANCHER_INTEGRATOR_USERNAME'), help='API access key')
+    parser.add_argument('--password', default=os.getenv('RANCHER_INTEGRATOR_PASSWORD'), help='API secret key')
+    parser.add_argument('-i', '--insecure', default=os.getenv('RANCHER_INTEGRATOR_INSECURE'),  help='Toggle insecure https')
+    parser.add_argument('-w', '--wait', default=os.getenv('RANCHER_INTEGRATOR_WAIT'), help='Toggle run forever')
 
     # subparser for the different commands e.g. register, unregister
     subparsers = parser.add_subparsers(dest='command', help='Sub-commands')
@@ -154,10 +186,14 @@ def main():
     register_parser.add_argument('-n', '--name', help='new cluster name')
 
     # unregister subparser
-    unregister_parser = subparsers.add_parser('unregister', help='UNREGISTER a cluster from rancher')
-    unregister_parser.add_argument('name', help='cluster name')
+    unregister_parser = subparsers.add_parser('unregister',  help='UNREGISTER a cluster from rancher')
+    unregister_parser.add_argument('name', default=os.getenv('RANCHER_INTEGRATOR_NAME'), help='cluster name')
+
+    # verify_api subparser
+    verify_api_parser = subparsers.add_parser('verify', help='VERIFY the API credentials are suitable for cluster management')
 
     args = parser.parse_args()
+
     if args.command is not None:
         rancher_url = 'https://' + args.url + '/v3'
         access_key = args.username
@@ -176,8 +212,11 @@ def main():
         elif args.command == 'unregister':
             resp = r.unregister_cluster(args.name)
             print(resp)
+        elif args.command == 'verify':
+            resp = r.verify_api_client()
+            print(resp)
 
-        if args.wait:
+        if args.wait == True:
             loop_forever = True
             while loop_forever:
                 try:
