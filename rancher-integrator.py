@@ -175,8 +175,8 @@ def main():
     parser.add_argument('--url', default=os.getenv('RANCHER_INTEGRATOR_URL'), required=True, help='Rancher url')
     parser.add_argument('--username', default=os.getenv('RANCHER_INTEGRATOR_USERNAME'), required=True, help='API access key')
     parser.add_argument('--password', default=os.getenv('RANCHER_INTEGRATOR_PASSWORD'), required=True, help='API secret key')
-    parser.add_argument('-i', '--insecure', default=os.getenv('RANCHER_INTEGRATOR_INSECURE'),  help='Toggle insecure https')
-    parser.add_argument('-w', '--wait', default=os.getenv('RANCHER_INTEGRATOR_WAIT'), help='Toggle run forever')
+    parser.add_argument('-i', '--insecure', default=os.getenv('RANCHER_INTEGRATOR_INSECURE'),  help='Toggle insecure https (True|False)')
+    parser.add_argument('-w', '--wait', default=os.getenv('RANCHER_INTEGRATOR_WAIT'), help='Toggle run forever (True|False)')
 
     # subparser for the different commands e.g. register, unregister
     subparsers = parser.add_subparsers(dest='command', help='Sub-commands')

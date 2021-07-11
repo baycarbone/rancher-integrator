@@ -9,7 +9,7 @@ https://github.com/rancher/client-python
 
 ## Usage
 ```bash
-usage: rancher-integrator [-h] [--url URL] [--username USERNAME] [--password PASSWORD] [-i INSECURE] [-w WAIT] {register,unregister,verify} ...
+usage: rancher-integrator [-h] --url URL --username USERNAME --password PASSWORD [-i INSECURE] [-w WAIT] {register,unregister,verify} ...
 
 Handle cluster registration in rancher
 
@@ -26,8 +26,10 @@ optional arguments:
   --username USERNAME   API access key
   --password PASSWORD   API secret key
   -i INSECURE, --insecure INSECURE
-                        Toggle insecure https
-  -w WAIT, --wait WAIT  Toggle run forever
+                        Toggle insecure https (True|False)
+  -w WAIT, --wait WAIT  Toggle run forever (True|False)
+
+See '<command> --help' to read about a specific sub-command
 ```
 
 The following environment variables can be used instead of command line arguments.
