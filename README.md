@@ -9,21 +9,23 @@ https://github.com/rancher/client-python
 
 ## Usage
 ```bash
-usage: rancher-integrator [-h] [-i] [-w] url username password {register,unregister} ...
+usage: rancher-integrator [-h] [--url URL] [--username USERNAME] [--password PASSWORD] [-i INSECURE] [-w WAIT] {register,unregister,verify} ...
 
 Handle cluster registration in rancher
 
 positional arguments:
-  url                   Rancher url
-  username              API access key
-  password              API secret key
-  {register,unregister}
+  {register,unregister,verify}
                         Sub-commands
     register            REGISTER a cluster in rancher
     unregister          UNREGISTER a cluster from rancher
+    verify              VERIFY the API credentials are suitable for cluster management
 
 optional arguments:
   -h, --help            show this help message and exit
-  -i, --insecure        Allow insecure https
-  -w, --wait            Run forever
+  --url URL             Rancher url
+  --username USERNAME   API access key
+  --password PASSWORD   API secret key
+  -i INSECURE, --insecure INSECURE
+                        Toggle insecure https
+  -w WAIT, --wait WAIT  Toggle run forever
 ```
