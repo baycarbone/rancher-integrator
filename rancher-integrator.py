@@ -39,13 +39,13 @@ class RancherRegsitration:
                 logging.error('Failed to create a Rancher API client due to certificate verification failure. Perhaps you might want to try with the --cert_check option set to False.')
                 self.exit_or_wait()
             else:
-                logging.error('Failed to create a Rancher API client, please check the API connection details. ConnectionError: %s', err)
+                logging.error('Failed to create a Rancher API client, please check the API connection details. Err - ConnectionError: %s', err)
                 self.exit_or_wait()
         except rancher.ApiError as err:
-            logging.error('Failed to create a Rancher API client, please check the API credentials. ApiError: %s.', err)
+            logging.error('Failed to create a Rancher API client, please check the API credentials. Err - ApiError: %s.', err)
             self.exit_or_wait()
         except JSONDecodeError as err:
-            logging.error('Failed to create a Rancher API client, please check the API connection details. JSONDecodeError: %s', err)
+            logging.error('Failed to create a Rancher API client, please check the API connection details. Err - JSONDecodeError: %s', err)
             self.exit_or_wait()
 
         return client
@@ -64,14 +64,14 @@ class RancherRegsitration:
                 logging.error('Failed to create temp cluster %s, a cluster with the same name already exists.', temp_cluster)
                 return False
             else:
-                logging.error('Failed to create temp cluster %s, API error: %s.', temp_cluster, err)
+                logging.error('Failed to create temp cluster %s. Err - ApiError: %s.', temp_cluster, err)
                 return False
 
         time.sleep(1)
         try:
             self.unregister_cluster(temp_cluster)
         except rancher.ApiError as err:
-            logging.error('Failed to create temp cluster %s, API error: %s.', temp_cluster, err)
+            logging.error('Failed to create temp cluster %s. Err - ApiError: %s.', temp_cluster, err)
             return False
 
         return True
@@ -96,7 +96,7 @@ class RancherRegsitration:
                 logging.error('Failed to register cluster, the format of the cluster name is invalid: %s.', name)
                 self.exit_or_wait()
             else:
-                logging.error('Failed to register cluster %s, API error: %s.', name, err)
+                logging.error('Failed to register cluster %s. Err - ApiError: %s.', name, err)
                 self.exit_or_wait()
 
         # create registration token for the cluster
@@ -112,7 +112,7 @@ class RancherRegsitration:
                     count += 1
                     time.sleep(1)
                 else:
-                    logging.error('Unable to retrieve the cluster registration token for cluster: %s. ApiError: %s.', name, err)
+                    logging.error('Unable to retrieve the cluster registration token for cluster: %s. Err - ApiError: %s.', name, err)
                     self.exit_or_wait()
         if count == 5:
             logging.error('Failed to retrieve a cluster registration token for cluster: %s. Max retry attempts reached.', name)
@@ -133,7 +133,7 @@ class RancherRegsitration:
         try:
             resultFilePath, responseHeaders = urllib.request.urlretrieve(import_manifest_url, storage_directory / manifest_file_name)
         except urllib.error.HTTPError as err:
-            logging.error('Failed to retrieve the import manifest (%s) for cluster: %s. Error: %s', import_manifest_url, name, err)
+            logging.error('Failed to retrieve the import manifest (%s) for cluster: %s. Err - Error: %s', import_manifest_url, name, err)
             self.unregister_cluster(name)
             self.exit_or_wait()
 
@@ -146,7 +146,7 @@ class RancherRegsitration:
         try:
             cluster = self.client.list_cluster(name=name)
         except rancher.ApiError as err:
-            logging.error('Failed to unregister cluster %s, API error', err)
+            logging.error('Failed to unregister cluster %s. Err - ApiError: %s', name, err)
             self.exit_or_wait()
 
         # get cluster by id
@@ -159,14 +159,14 @@ class RancherRegsitration:
         try:
             cluster = self.client.by_id_cluster(cluster_id)
         except rancher.ApiError as err:
-            logging.error('Failed to unregister cluster %s, API error', err)
+            logging.error('Failed to unregister cluster %s. Err - ApiError: %s', name, err)
             self.exit_or_wait()
 
         # unregister cluster
         try:
             resp = self.client.delete(cluster)
         except rancher.ApiError as err:
-            logging.error('Failed to unregister cluster %s, API error', err)
+            logging.error('Failed to unregister cluster %s. Err - ApiError: %s', name, err)
             self.exit_or_wait()
 
         return resp
