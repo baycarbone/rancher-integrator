@@ -79,7 +79,7 @@ class RancherRegsitration:
     def register_cluster(self, name):
         '''Register a cluster in a Rancher platform and retrieve the Kubernetes import manifest'''
 
-        if name is None:
+        if name is None or name == 'None':
             name = petname.Generate()
 
         # import cluster
@@ -108,6 +108,10 @@ class RancherRegsitration:
                 token_created = True
             except rancher.ApiError as err:
                 if re.search(r'Forbidden.*cannot create resource "clusterregistrationtokens"', str(err)):
+                    logging.warning('Unable to retrieve the cluster registration token for cluster: %s. Will retry in 1 second.', name)
+                    count += 1
+                    time.sleep(1)
+                elif re.search(r'namespaces.*not found', str(err)):
                     logging.warning('Unable to retrieve the cluster registration token for cluster: %s. Will retry in 1 second.', name)
                     count += 1
                     time.sleep(1)
