@@ -18,8 +18,13 @@ class RancherRegsitration:
         # clear log file
         with open('error.log', 'w'):
             pass
-        logging.basicConfig(filename='error.log', level=logging.ERROR)
-        logging.getLogger().addHandler(logging.StreamHandler())
+
+        logging.basicConfig(level=logging.WARNING)
+
+        file_handler = logging.FileHandler('error.log')
+        file_handler.setLevel(logging.ERROR)
+        logging.getLogger().addHandler(file_handler)
+
         self.wait = wait
         self.client = self._create_client(rancher_url, access_key, secret_key, cert_verify)
 
