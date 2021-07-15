@@ -151,7 +151,7 @@ class RancherRegsitration:
 
     def unregister_cluster(self, name):
         '''Unregister a cluster in a Rancher platform'''
-        # get cluster by name
+        # get cluster by name - TODO: make sure name is not None, otherwise will delete cluster at index 0
         try:
             cluster = self.client.list_cluster(name=name)
         except rancher.ApiError as err:
@@ -205,7 +205,7 @@ def main():
     parser.add_argument('-l', '--url', default=os.getenv('RANCHER_INTEGRATOR_URL'), help='Rancher url')
     parser.add_argument('-u', '--username', default=os.getenv('RANCHER_INTEGRATOR_USERNAME'), help='API access key')
     parser.add_argument('-p', '--password', default=os.getenv('RANCHER_INTEGRATOR_PASSWORD'), help='API secret key')
-    parser.add_argument('-c', '--cert_check', default=os.getenv('RANCHER_INTEGRATOR_CERT_CHECK'), help='Toggle certificate check https (True|False)')
+    parser.add_argument('-c', '--cert_check', default=os.getenv('RANCHER_INTEGRATOR_CERT_CHECK'), help='Toggle certificate check (True|False)')
     parser.add_argument('-w', '--wait', default=os.getenv('RANCHER_INTEGRATOR_WAIT'), help='Toggle run forever (True|False)')
 
     # subparser for the different commands e.g. register, unregister
