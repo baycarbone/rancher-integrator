@@ -109,7 +109,12 @@ class RancherRegsitration:
         count = 0
         while count < 5 and not token_created:
             try:
-                reg_data = self.client.create_clusterRegistrationToken(clusterId=cluster_data.data_dict()['id'])
+                reg_data = self.client.list_clusterRegistrationToken(clusterId=cluster_data.data_dict()['id'])
+                reg_data = reg_data.data_dict()
+                if not reg_data['data'] or 'manifestUrl' not in reg_data['data'][0] or reg_data['data'][0]['manifestUrl'] == '':
+                    logging.warning('Waiting for the cluster registration token to appear for cluster: %s. Will retry in 5 second.', name)
+                    time.sleep(5)
+                    continue;
                 token_created = True
             except rancher.ApiError as err:
                 if re.search(r'Forbidden.*cannot create resource "clusterregistrationtokens"', str(err)):
@@ -127,8 +132,9 @@ class RancherRegsitration:
             logging.error('Failed to retrieve a cluster registration token for cluster: %s. Max retry attempts reached.', name)
             self.exit_or_wait()
 
+
         # fetch registration token for the cluster
-        import_manifest_url = reg_data.data_dict()['manifestUrl']
+        import_manifest_url = reg_data['data'][0]['manifestUrl']
         storage_directory = Path('import_manifest')
 
         # if the destination directory already exists, just delete it
